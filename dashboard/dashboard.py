@@ -56,7 +56,6 @@ def plot_monthly_trend(data, title, color='skyblue'):
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(monthly['dteday'], monthly['total_count'], marker='o', linestyle='-', color=color)
     
-    # Styling for Dark Theme
     ax.set_facecolor('#00172B')
     fig.patch.set_facecolor('#00172B')
     ax.tick_params(colors='white')
@@ -146,7 +145,6 @@ ax.grid(axis='y', linestyle='--', alpha=0.3)
 st.pyplot(fig)
 
 with st.expander("Lihat Detail Angka Pertumbuhan YoY"):
-    # Menambahkan kolom persentase pertumbuhan per bulan
     monthly_yoy['Growth (%)'] = (monthly_yoy['2012'] - monthly_yoy['2011']) / monthly_yoy['2011'] * 100
     st.dataframe(monthly_yoy.style.format("{:.2f}"))
 
