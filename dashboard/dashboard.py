@@ -48,6 +48,33 @@ st.sidebar.markdown("""
 - **ID Dicoding:** thoriqkemal
 """)
 
+# --- SIDEBAR FILTER ---
+st.sidebar.header("Filter Eksplorasi")
+
+min_date = hour_df["dteday"].min()
+max_date = hour_df["dteday"].max()
+
+start_date, end_date = st.sidebar.date_input(
+    label='Rentang Waktu',
+    min_value=min_date,
+    max_value=max_date,
+    value=[min_date, max_date]
+)
+
+season_map = {1: 'Winter', 2: 'Spring', 3: 'Summer', 4: 'Fall'}
+selected_season = st.sidebar.multiselect(
+    "Pilih Musim:",
+    options=list(season_map.keys()),
+    default=list(season_map.keys()),
+    format_func=lambda x: season_map[x]
+)
+
+filter_df = hour_df[
+    (hour_df["dteday"] >= pd.to_datetime(start_date)) & 
+    (hour_df["dteday"] <= pd.to_datetime(end_date)) &
+    (hour_df["season"].isin(selected_season))
+]
+
 # --- 3. HELPER PLOTTING FUNCTION ---
 def plot_monthly_trend(data, title, color='skyblue'):
     monthly = data.groupby(pd.Grouper(key='dteday', freq='ME'))['total_count'].sum().reset_index()
@@ -75,19 +102,19 @@ tab1, tab2 = st.tabs(["Histograms", "Pie Charts"])
 with tab1:
     features_hist = ['month', 'hour', 'weekday', 'temp', 'humidity', 'windspeed']
     for feat in features_hist:
-        fig = px.histogram(hour_df, x=feat, y='total_count', title=f'Distribution of {feat.capitalize()}', color_discrete_sequence=['#636EFA'], template="plotly_dark")
+        fig = px.histogram(filter_df, x=feat, y='total_count', title=f'Distribution of {feat.capitalize()}', color_discrete_sequence=['#636EFA'], template="plotly_dark")
         fig.update_layout(bargap=0.1)
         st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     features_pie = ['season', 'year', 'holiday', 'workingday', 'weather_condition']
     for feat in features_pie:
-        fig = px.pie(hour_df, names=feat, values='total_count', title=f'Share by {feat.replace("_", " ").capitalize()}')
+        fig = px.pie(filter_df, names=feat, values='total_count', title=f'Share by {feat.replace("_", " ").capitalize()}')
         st.plotly_chart(fig, use_container_width=True)
 
 # --- 5. CORRELATION ---
 st.subheader('Correlation Matrix')
-correlation = hour_df.select_dtypes(include=['number']).corr()
+correlation = filter_df.select_dtypes(include=['number']).corr()
 fig_corr, ax_corr = plt.subplots(figsize=(10, 8))
 sns.heatmap(correlation, annot=True, fmt=".2f", cmap='coolwarm', ax=ax_corr)
 st.pyplot(fig_corr)
