@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
@@ -28,13 +29,11 @@ def load_data():
         'cnt': 'total_count'
     }, inplace=True)
     
-    q1, q3 = df['total_count'].quantile([0.25, 0.75])
-    iqr = q3 - q1
+    q1 = df['total_count'].quantile(0.25)
+    q3 = df['total_count'].quantile(0.75)
 
-    lower_bound = q1 - (1.5 * iqr)
-    upper_bound = q3 + (1.5 * iqr)
-
-    df = df[(df['total_count'] >= lower_bound) & (df['total_count'] <= upper_bound)]
+    df['total_count'] = np.where(df['total_count'] > q3, q3, df['total_count'])
+    df['total_count'] = np.where(df['total_count'] < q1, q1, df['total_count'])
     
     return df
 
@@ -99,60 +98,73 @@ st.header('Pertanyaan Bisnis')
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("Total Rental: Des 2012")
+    st.subheader("YoY growth in Desember")
     st.info("""
-    Berapa total terpinjam pada bulan Desember 2012?
+        Apakah total peminjaman sepeda pada bulan Desember 2012 mengalami pertumbuhan dibandingkan dengan Desember 2011, dan faktor apa yang paling memengaruhinya?
     """)
-    total = hour_df[(hour_df['year'] == 1) & (hour_df['month'] == 12)]['total_count'].sum()
-    st.metric("Total Terpinjam", f"{total:,}")
+    dec_2011 = hour_df[(hour_df['dteday'].dt.year == 2011) & (hour_df['dteday'].dt.month == 12)]['total_count'].sum()
+    dec_2012 = hour_df[(hour_df['dteday'].dt.year == 2012) & (hour_df['dteday'].dt.month == 12)]['total_count'].sum()
+
+    growth = dec_2012 - dec_2011
+    growth_percentage = (growth / dec_2011) * 100
+    st.metric(
+        label="Pertumbuhan Desember (YoY)", 
+        value=f"{dec_2012:,} unit", 
+        delta=f"{growth_percentage:.2f}% (vs 2011)"
+    )
 
 with col2:
     st.subheader("Seasonality Analysis")
     st.info("""
-    Tren Peminjaman Sepeda: Musim Paling Populer vs. Paling Sepi?
+        Bagaimana perbedaan signifikan jumlah rata-rata peminjaman sepeda antar musim di tahun 2012 untuk menentukan alokasi stok sepeda dan jadwal pemeliharaan armada?
     """)
+    seasonal_mean = hour_df.groupby('season')['total_count'].mean().reset_index()
     season_map = {
         1: 'Musim Dingin (Winter) ❄️',
         2: 'Musim Semi (Spring) 🌸',
         3: 'Musim Panas (Summer) ☀️',
         4: 'Musim Gugur (Autumn/Fall) 🍂'
-    }    
-    seasonal_data = hour_df.groupby('season')['total_count'].sum()
-    peak_season = season_map[seasonal_data.idxmax()]
-    low_season = season_map[seasonal_data.idxmin()]
-    st.write(f"✅ Paling Ramai: **{peak_season}**")
-    st.write(f"❌ Paling Sepi: **{low_season}**")
+    }
+    seasonal_mean['season_name'] = seasonal_mean['season'].map(season_map)
 
-st.subheader("Kinerja Peminjaman dalam Setahun Terakhir (2012)")
+    peak_season = seasonal_mean.loc[seasonal_mean['total_count'].idxmax()]
+    low_season = seasonal_mean.loc[seasonal_mean['total_count'].idxmin()]
+    st.write(f"✅ Paling Ramai: {peak_season['season_name']} dengan rata-rata {peak_season['total_count']:,.2f} total penyewaan.")
+    st.write(f"❌ Paling Sepi: {low_season['season_name']} dengan rata-rata {low_season['total_count']:,.2f} total penyewaan.")
+
+st.subheader("YoY Trends")
 st.info("""
-Bagaimana kinerja peminjaman per bulan dari tahun ke tahun?
+Bagaimana tren fluktuasi bulanan peminjaman sepeda dari tahun 2011 ke 2012 guna mengidentifikasi bulan-bulan dengan penurunan tajam yang memerlukan strategi promosi khusus?
 """)
 
-monthly_yoy = hour_df.groupby(['month', 'year'])['total_count'].sum().unstack()
-monthly_yoy.columns = ['2011', '2012']
-
-avg_growth = ((monthly_yoy['2012'].sum() - monthly_yoy['2011'].sum()) / monthly_yoy['2011'].sum()) * 100
+monthly_trend = hour_df.groupby(['year', 'month'])['total_count'].sum().reset_index()
 
 fig, ax = plt.subplots(figsize=(12, 6))
-sns.barplot(data=hour_df, x='month', y='total_count', hue='year', palette='viridis', ax=ax)
+sns.lineplot(data=monthly_trend, x='month', y='total_count', hue='year', marker='o', ax=ax)
 
-ax.set_title('Monthly Bike Rentals: 2011 vs 2012', fontsize=16, fontweight='bold')
-ax.set_xlabel('Month', fontsize=12, fontweight='bold') 
-ax.set_ylabel('Total Rental Count', fontsize=12, fontweight='bold')
+ax.set_title('Monthly Bike Rentals: 2011 vs 2012', fontsize=14, fontweight='bold')
+ax.set_xlabel('Month')
+ax.set_ylabel('Total Rental Count')
+ax.set_xticks(range(1, 13))
 ax.legend(title='Year', labels=['2011', '2012'])
-ax.grid(axis='y', linestyle='--', alpha=0.3)
+ax.grid(True, linestyle='--', alpha=0.7)
 
 st.pyplot(fig)
 
 with st.expander("Lihat Detail Angka Pertumbuhan YoY"):
-    monthly_yoy['Growth (%)'] = (monthly_yoy['2012'] - monthly_yoy['2011']) / monthly_yoy['2011'] * 100
+    monthly_yoy = hour_df.groupby(['month', 'year'])['total_count'].sum().unstack()
+    monthly_yoy.columns = ['2011', '2012']
+    monthly_yoy['Growth_Pct'] = ((monthly_yoy['2012'] - monthly_yoy['2011']) / monthly_yoy['2011']) * 100
     st.dataframe(monthly_yoy.style.format("{:.2f}"))
 
 # --- 7. CONCLUSION ---
 st.header("Conclusion")
 st.info("""
-1. Total sepeda terpinjam pada bulan Desember 2012 yaitu **114.538**.
-2. Peminjaman paling banyak terjadi pada **musim panas (summer)**, sedangkan peminjaman paling sedikit terjadi pada **musim dingin (winter)**
-3. Secara keseluruhan, kinerja peminjaman di tahun 2012 jauh melampaui 2011 di setiap bulannya. Tidak ada satu bulan pun yang mengalami penurunan. Ini menandakan bisnis atau layanan peminjaman sepeda tersebut berkembang dengan sangat pesat. Terjadi Lonjakan tinggi yang drastis di awal tahun dengan pertumbuhan rata-rata diatas 120%. 
+1. Iya, terjadi pertumbuhan yang signifikan di bulan Desember 2012. Berdasarkan data, jumlah peminjaman meningkat pesat dengan angka YoY Growth sebesar 31,17% dibandingkan Desember 2011. Faktor faktor yang mempengaruhi antara lain adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)** seperti yang ditampilkan pada matriks korelasi diatas.
+
+2. Pada **musim panas** merupakan periode dengan permintaan tertinggi, sehingga diperlukan pemeliharaan ketersediaan unit sebesar 100% di seluruh stasiun. Sebaliknya, **musim dingin** mencatatkan rata-rata peminjaman terendah, yang dapat dimanfaatkan sebagai periode optimal untuk melakukan pemeliharaan armada secara besar-besaran tanpa mengganggu stabilitas layanan.
+
+3. Kinerja tahun 2012 tumbuh melampaui 2011 secara konsisten tanpa ada penurunan performa YoY. Meski demikian, terdapat tren penurunan pasca-Juli hingga akhir tahun yang sejalan dengan transisi musim dingin. Mengingat faktor suhu sangat memengaruhi minat pengguna, pemberian 'Voucher khusus Cuaca Dingin' pada kuartal keempat menjadi strategi krusial untuk menjaga stabilitas jumlah penyewaan di luar jam sibuk. 
+
 4. Berdasarkan matriks korelasi, faktor yang paling berpengaruh terhadap jumlah penyewaan adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)**. Berdasarkan distribusinya, sepeda paling sering dipinjam pada jam-jam sibuk, khususnya pada pukul 4 sore hingga 7 malam.
 """)
