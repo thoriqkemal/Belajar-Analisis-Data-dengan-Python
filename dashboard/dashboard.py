@@ -89,19 +89,26 @@ filter_df = hour_df[
 ]
 
 # --- 3. HELPER PLOTTING FUNCTION ---
-def plot_monthly_trend(data, title, color='skyblue'):
+def plot_monthly_trend(data, title, color='#4682B4'):
     monthly = data.groupby(pd.Grouper(key='dteday', freq='M'))['total_count'].sum().reset_index()
     
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(monthly['dteday'], monthly['total_count'], marker='o', linestyle='-', color=color)
     
-    ax.set_facecolor('#00172B')
-    fig.patch.set_facecolor('#00172B')
-    ax.tick_params(colors='white')
-    ax.xaxis.label.set_color('white')
-    ax.yaxis.label.set_color('white')
-    ax.grid(True, alpha=0.3)
-    plt.title(title, color='white')
+    ax.set_facecolor('white')
+    fig.patch.set_facecolor('white')
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#333333')
+    ax.spines['bottom'].set_color('#333333')
+    
+    ax.tick_params(colors='#333333')
+    ax.xaxis.label.set_color('#333333')
+    ax.yaxis.label.set_color('#333333')
+
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.title(title, color='#333333', fontsize=14, pad=20)
     
     st.pyplot(fig)
 
@@ -115,14 +122,38 @@ tab1, tab2 = st.tabs(["Histograms", "Pie Charts"])
 with tab1:
     features_hist = ['month', 'hour', 'weekday', 'temp', 'humidity', 'windspeed']
     for feat in features_hist:
-        fig = px.histogram(filter_df, x=feat, y='total_count', title=f'Distribution of {feat.capitalize()}', color_discrete_sequence=['#636EFA'], template="plotly_dark")
-        fig.update_layout(bargap=0.1)
+        fig = px.histogram(filter_df, x=feat, y='total_count', title=f'Distribution of {feat.capitalize()}', color_discrete_sequence=['#4682B4'], template="plotly_white")
+        fig.update_layout(
+            bargap=0.1,
+            font=dict(color="#333333"),
+            title_font=dict(size=18),
+            xaxis=dict(showgrid=False),
+            yaxis=dict(gridcolor='#EEEEEE')
+        )
         st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     features_pie = ['season', 'year', 'holiday', 'workingday', 'weather_condition']
     for feat in features_pie:
-        fig = px.pie(filter_df, names=feat, values='total_count', title=f'Share by {feat.replace("_", " ").capitalize()}')
+        fig = px.pie(
+            filter_df, 
+            names=feat, 
+            values='total_count', 
+            title=f'Share by {feat.replace("_", " ").capitalize()}',
+            template="plotly_white",
+            color_discrete_sequence=px.colors.sequential.Blues_r 
+        )
+        
+        fig.update_traces(
+            textposition='inside', 
+            textinfo='percent+label',
+            marker=dict(line=dict(color='white', width=2))
+        )
+        
+        fig.update_layout(
+            font=dict(color="#333333"),
+            showlegend=True
+        )
         st.plotly_chart(fig, use_container_width=True)
 
 # --- 5. CORRELATION ---
