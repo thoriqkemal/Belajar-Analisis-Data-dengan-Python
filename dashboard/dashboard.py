@@ -54,12 +54,25 @@ st.sidebar.header("Filter Eksplorasi")
 min_date = hour_df["dteday"].min()
 max_date = hour_df["dteday"].max()
 
-start_date, end_date = st.sidebar.date_input(
-    label='Rentang Waktu',
-    min_value=min_date,
-    max_value=max_date,
-    value=[min_date, max_date]
-)
+try:
+    # Mengambil input rentang waktu
+    date_range = st.sidebar.date_input(
+        label='Rentang Waktu',
+        min_value=min_date,
+        max_value=max_date,
+        value=[min_date, max_date]
+    )
+
+    # Validasi: Cek apakah pengguna sudah memilih kedua tanggal (start & end)
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+    else:
+        st.warning("Silakan pilih rentang waktu yang lengkap (Tanggal Mulai dan Tanggal Selesai).")
+        st.stop() # Menghentikan eksekusi sementara sampai input lengkap
+
+except Exception as e:
+    st.error(f"Terjadi kesalahan pada input tanggal: {e}")
+    st.stop()
 
 season_map = {1: 'Winter', 2: 'Spring', 3: 'Summer', 4: 'Fall'}
 selected_season = st.sidebar.multiselect(
@@ -162,7 +175,7 @@ st.info("""
 * Sebaliknya pada **Kondisi Kurang Ideal (Hujan/Salju atau Ekstrem)**, terjadi penurunan permintaan yang signifikan akibat faktor cuaca buruk atau kecepatan angin tinggi.
 """)
 
-# --- 6. BUSINESS QUESTIONS ---
+# --- 7. BUSINESS QUESTIONS ---
 st.header('Pertanyaan Bisnis')
 
 col1, col2 = st.columns(2)
