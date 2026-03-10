@@ -263,7 +263,6 @@ with st.expander("Lihat Detail Angka Pertumbuhan YoY"):
     monthly_yoy['Growth_Pct'] = ((monthly_yoy['2012'] - monthly_yoy['2011']) / monthly_yoy['2011']) * 100
     st.dataframe(monthly_yoy.style.format("{:.2f}"))
 
-# --- 7. CONCLUSION ---
 st.header("Conclusion")
 st.info("""
 1. Iya, terjadi pertumbuhan yang signifikan di bulan Desember 2012. Berdasarkan data, jumlah peminjaman meningkat pesat dengan angka YoY Growth sebesar 31,17% dibandingkan Desember 2011. Faktor faktor yang mempengaruhi antara lain adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)** seperti yang ditampilkan pada matriks korelasi diatas.
@@ -272,5 +271,17 @@ st.info("""
 
 3. Kinerja tahun 2012 tumbuh melampaui 2011 secara konsisten tanpa ada penurunan performa YoY. Meski demikian, terdapat tren penurunan pasca-Juli hingga akhir tahun yang sejalan dengan transisi musim dingin. Mengingat faktor suhu sangat memengaruhi minat pengguna, pemberian 'Voucher khusus Cuaca Dingin' pada kuartal keempat menjadi strategi krusial untuk menjaga stabilitas jumlah penyewaan di luar jam sibuk. 
 
-4. Berdasarkan matriks korelasi, faktor yang paling berpengaruh terhadap jumlah penyewaan adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)**. Berdasarkan distribusinya, sepeda paling sering dipinjam pada jam-jam sibuk, khususnya pada pukul 4 sore hingga 7 malam.
+- Berdasarkan matriks korelasi, faktor yang paling berpengaruh terhadap jumlah penyewaan adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)**. Berdasarkan distribusinya, sepeda paling sering dipinjam pada jam-jam sibuk, khususnya pada pukul 4 sore hingga 7 malam.
+""")
+
+# --- 8. SARAN/REKOMENDASI ---
+st.header("Saran/Rekomendasi")
+st.info("""
+- 1. Berdasarkan pertumbuhan signifikan sebesar 31,17% (YoY) di Desember 2012, ditemukan bahwa pengguna terdaftar memiliki korelasi tertinggi (97%) terhadap jumlah peminjaman. Rekomendasi kami adalah dengan  memperkuat program loyalitas (seperti membership tahunan atau poin reward) karena kelompok ini / **Pengguna terdaftar** adalah kontributor pendapatan paling stabil, terutama untuk memitigasi fluktuasi jumlah pengguna baru (casual) di akhir tahun.
+
+- 2. Data menunjukkan perbedaan permintaan yang ekstrem, di mana musim panas mencatatkan permintaan tertinggi sementara musim dingin mencatatkan angka terendah. Disarankan untuk menerapkan sistem pemeliharaan bergulir (rolling maintenance). Alokasikan 100% ketersediaan unit selama **musim panas** untuk **memaksimalkan revenue**, dan jadwalkan **pemeliharaan besar (overhaul)** armada pada **musim dingin**. Hal ini akan meminimalisir downtime layanan pada saat permintaan sedang melonjak.
+
+- 3. Untuk menjaga stabilitas penyewaan, diperlukan '**Voucher Khusus Musim Dingin**' atau **insentif khusus** pada kuartal keempat. Target utama promosi ini adalah **jam-jam di luar sibuk** (off-peak hours) guna menstimulasi minat pengguna yang c**enderung menurun akibat faktor cuaca**.
+
+- Faktor jam peminjaman (42%) menunjukkan pola distribusi yang sangat terpusat pada pukul 16.00 hingga 19.00. Guna menghindari kekosongan unit di titik-titik krusial, manajemen perlu melakukan rebalancing armada secara proaktif menuju area perkantoran atau hub transportasi utama sebelum pukul 4 sore. Langkah ini memastikan permintaan pada jam sibuk dapat terpenuhi secara maksimal tanpa adanya kehilangan potensi pelanggan akibat unit yang tidak tersedia.
 """)
