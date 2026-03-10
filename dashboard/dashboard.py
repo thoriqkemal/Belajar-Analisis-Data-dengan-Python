@@ -137,12 +137,11 @@ with col1:
     
     labels = ['Desember 2011', 'Desember 2012']
     values = [dec_2011, dec_2012]
-    colors = ['#aec7e8', '#1f77b4']
 
     # 3. Create the Figure and Axis explicitly
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    bars = ax.bar(labels, values, color=colors, width=0.6)
+    bars = ax.bar(labels, values, color='#4682B4',width=0.6)
 
     # Add value labels on top of bars
     for bar in bars:
@@ -197,23 +196,12 @@ with col2:
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    colors = []
-    for val in seasonal_mean['total_count']:
-        if val == peak_season['total_count']:
-            colors.append('#2ecc71') # Green for Peak
-        elif val == low_season['total_count']:
-            colors.append('#e74c3c') # Red for Low
-        else:
-            colors.append('#3498db') # Blue for others
-
     sns.barplot(
-    x='season_name', 
-    y='total_count', 
-    hue='season_name',
-    data=seasonal_mean, 
-    palette=colors,
-    legend=False,
-    ax=ax
+        x='season_name', 
+        y='total_count', 
+        data=seasonal_mean, 
+        color='#4682B4',
+        legend=False
     )
 
     for p in ax.patches:
