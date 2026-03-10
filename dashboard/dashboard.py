@@ -119,6 +119,49 @@ fig_corr, ax_corr = plt.subplots(figsize=(10, 8))
 sns.heatmap(correlation, annot=True, fmt=".2f", cmap='coolwarm', ax=ax_corr)
 st.pyplot(fig_corr)
 
+# --- 6. ADVANCED ANALYSIS: CLUSTERING ---
+st.header("Analisis Lanjutan: Environmental Clustering")
+
+def classify_usage_segment(row):
+    if row['temp'] > 0.6 and row['weather_condition'] == 1:
+        return 'Kondisi Ideal (Cerah & Hangat)'
+    elif row['weather_condition'] >= 3 or row['windspeed'] > 0.5:
+        return 'Kondisi Kurang Ideal (Ekstrem)'
+    elif row['humidity'] > 0.7:
+        return 'Kondisi Menengah (Lembap)'
+    else:
+        return 'Kondisi Standar'
+
+filter_df['usage_cluster'] = filter_df.apply(classify_usage_segment, axis=1)
+
+cluster_summary = filter_df.groupby('usage_cluster')['total_count'].mean().sort_values(ascending=False).reset_index()
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+sns.barplot(
+    x='usage_cluster', 
+    y='total_count', 
+    data=cluster_summary, 
+    color='#4682B4',
+    ax=ax
+)
+
+plt.xticks(rotation=15, ha='right')
+
+ax.set_title('Average Rentals by Environmental Cluster', fontsize=14, fontweight='bold')
+ax.set_xlabel('Usage Segment Cluster')
+ax.set_ylabel('Average Total Count')
+sns.despine()
+
+st.pyplot(fig)
+
+st.info("""
+**Insight Analisis Clustering:**
+* Cluster ini dibentuk dengan menggabungkan variabel **temp**, **humidity**, **windspeed**, dan **weather_condition** untuk memberikan gambaran kondisi lingkungan yang komprehensif.
+* **Kondisi Ideal (Cerah dan Hangat)** menunjukkan rata-rata peminjaman yang jauh lebih tinggi dibandingkan segmen lainnya.
+* Sebaliknya pada **Kondisi Kurang Ideal (Hujan/Salju atau Ekstrem)**, terjadi penurunan permintaan yang signifikan akibat faktor cuaca buruk atau kecepatan angin tinggi.
+""")
+
 # --- 6. BUSINESS QUESTIONS ---
 st.header('Pertanyaan Bisnis')
 
@@ -138,37 +181,31 @@ with col1:
     labels = ['Desember 2011', 'Desember 2012']
     values = [dec_2011, dec_2012]
 
-    # 3. Create the Figure and Axis explicitly
     fig, ax = plt.subplots(figsize=(10, 6))
 
     bars = ax.bar(labels, values, color='#4682B4',width=0.6)
 
-    # Add value labels on top of bars
     for bar in bars:
         yval = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2, yval + (max(values)*0.02), 
                 f'{int(yval):,}', ha='center', va='bottom', 
                 fontsize=12, fontweight='bold')
 
-    # Add the Growth Percentage Box
     ax.text(0.5, max(values) * 0.5, f"Growth: +{growth_percentage:.2f}%", 
             ha='center', fontsize=13, color='darkblue', fontweight='bold',
             bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="darkblue", lw=1.5))
 
-    # Styling using the 'ax' object
     ax.set_title('Growth of Total Rental\nDesember 2011 vs Desember 2012', 
                 fontsize=14, fontweight='bold', pad=20)
     ax.set_ylabel('Total Rental Count', fontsize=12)
     ax.set_ylim(0, max(values) * 1.2)
     ax.grid(axis='y', linestyle='--', alpha=0.7)
 
-    # Clean up spines
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
     plt.tight_layout()
 
-    # 4. Display in Streamlit
     st.pyplot(fig)
 
     st.metric(
