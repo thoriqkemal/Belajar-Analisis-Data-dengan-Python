@@ -77,7 +77,7 @@ filter_df = hour_df[
 
 # --- 3. HELPER PLOTTING FUNCTION ---
 def plot_monthly_trend(data, title, color='skyblue'):
-    monthly = data.groupby(pd.Grouper(key='dteday', freq='ME'))['total_count'].sum().reset_index()
+    monthly = data.groupby(pd.Grouper(key='dteday', freq='M'))['total_count'].sum().reset_index()
     
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(monthly['dteday'], monthly['total_count'], marker='o', linestyle='-', color=color)
@@ -134,10 +134,48 @@ with col1:
 
     growth = dec_2012 - dec_2011
     growth_percentage = (growth / dec_2011) * 100
+    
+    labels = ['Desember 2011', 'Desember 2012']
+    values = [dec_2011, dec_2012]
+    colors = ['#aec7e8', '#1f77b4']
+
+    # 3. Create the Figure and Axis explicitly
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    bars = ax.bar(labels, values, color=colors, width=0.6)
+
+    # Add value labels on top of bars
+    for bar in bars:
+        yval = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2, yval + (max(values)*0.02), 
+                f'{int(yval):,}', ha='center', va='bottom', 
+                fontsize=12, fontweight='bold')
+
+    # Add the Growth Percentage Box
+    ax.text(0.5, max(values) * 0.5, f"Growth: +{growth_percentage:.2f}%", 
+            ha='center', fontsize=13, color='darkblue', fontweight='bold',
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="darkblue", lw=1.5))
+
+    # Styling using the 'ax' object
+    ax.set_title('Growth of Total Rental\nDesember 2011 vs Desember 2012', 
+                fontsize=14, fontweight='bold', pad=20)
+    ax.set_ylabel('Total Rental Count', fontsize=12)
+    ax.set_ylim(0, max(values) * 1.2)
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Clean up spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.tight_layout()
+
+    # 4. Display in Streamlit
+    st.pyplot(fig)
+
     st.metric(
         label="Pertumbuhan Desember (YoY)", 
         value=f"{dec_2012:,} unit", 
-        delta=f"{growth_percentage:.2f}% (vs 2011)"
+        delta=f"{growth_percentage:.2f}% (20212 vs 2011)"
     )
 
 with col2:
@@ -147,17 +185,58 @@ with col2:
     """)
     seasonal_mean = hour_df.groupby('season')['total_count'].mean().reset_index()
     season_map = {
-        1: 'Musim Dingin (Winter) ❄️',
-        2: 'Musim Semi (Spring) 🌸',
-        3: 'Musim Panas (Summer) ☀️',
-        4: 'Musim Gugur (Autumn/Fall) 🍂'
+        1: 'Musim Dingin (Winter)',
+        2: 'Musim Semi (Spring)',
+        3: 'Musim Panas (Summer)',
+        4: 'Musim Gugur (Autumn/Fall)'
     }
     seasonal_mean['season_name'] = seasonal_mean['season'].map(season_map)
 
     peak_season = seasonal_mean.loc[seasonal_mean['total_count'].idxmax()]
     low_season = seasonal_mean.loc[seasonal_mean['total_count'].idxmin()]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    colors = []
+    for val in seasonal_mean['total_count']:
+        if val == peak_season['total_count']:
+            colors.append('#2ecc71') # Green for Peak
+        elif val == low_season['total_count']:
+            colors.append('#e74c3c') # Red for Low
+        else:
+            colors.append('#3498db') # Blue for others
+
+    sns.barplot(
+    x='season_name', 
+    y='total_count', 
+    hue='season_name',
+    data=seasonal_mean, 
+    palette=colors,
+    legend=False,
+    ax=ax
+    )
+
+    for p in ax.patches:
+        ax.annotate(f'{p.get_height():.2f}', 
+            (p.get_x() + p.get_width() / 2., p.get_height()), 
+            ha = 'center', va = 'center', 
+            xytext = (0, 9), 
+            textcoords = 'offset points',
+            fontsize=11, fontweight='bold')
+
+    ax.set_title('Mean of Total Count Each Season', fontsize=15, pad=20, fontweight='bold')
+    ax.set_xlabel('Season', fontsize=12)
+    ax.set_ylabel('Mean of Total Count', fontsize=12)
+    plt.xticks(rotation=15)
+    ax.set_ylim(0, peak_season['total_count'] * 1.15) 
+
+    plt.tight_layout()
+
+    st.pyplot(fig)
+
     st.write(f"✅ Paling Ramai: {peak_season['season_name']} dengan rata-rata {peak_season['total_count']:,.2f} total penyewaan.")
     st.write(f"❌ Paling Sepi: {low_season['season_name']} dengan rata-rata {low_season['total_count']:,.2f} total penyewaan.")
+
 
 st.subheader("YoY Trends")
 st.info("""
