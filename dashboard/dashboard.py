@@ -303,7 +303,7 @@ with st.expander("Lihat Detail Angka Pertumbuhan YoY"):
 
 st.header("Conclusion")
 st.info("""
-1. Iya, terjadi pertumbuhan yang signifikan di bulan Desember 2012. Berdasarkan data, jumlah peminjaman meningkat pesat dengan angka YoY Growth sebesar 31,17% dibandingkan Desember 2011. Faktor faktor yang mempengaruhi antara lain adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)** seperti yang ditampilkan pada matriks korelasi diatas.
+1. Berdasarkan data, jumlah peminjaman meningkat pesat dengan angka YoY Growth sebesar 31,17% dibandingkan Desember 2011. Faktor faktor yang mempengaruhi antara lain adalah kategori **pengguna terdaftar (97%)** dan **jam peminjaman (42%)** seperti yang ditampilkan pada matriks korelasi diatas.
 
 2. Pada **musim panas** merupakan periode dengan permintaan tertinggi, sehingga diperlukan pemeliharaan ketersediaan unit sebesar 100% di seluruh stasiun. Sebaliknya, **musim dingin** mencatatkan rata-rata peminjaman terendah, yang dapat dimanfaatkan sebagai periode optimal untuk melakukan pemeliharaan armada secara besar-besaran tanpa mengganggu stabilitas layanan.
 
