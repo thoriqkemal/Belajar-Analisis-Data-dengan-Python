@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+env/
+bin/
+lib/
+develop-eggs/
+dist/
+build/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+# If you want to ignore the heavy data output in notebooks (optional)
+# .artifacts/
+.devcontainer
+
+# Data and Logs
+*.log
+*.csv
+*.xlsx
+# (Keep raw data out of Git if it's large)
+data/raw/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
