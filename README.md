@@ -19,6 +19,12 @@ Berdasarkan visualisasi dan perhitungan pada dashboard, berikut adalah temuan ut
 * **Rolling Maintenance**: Alokasikan 100% ketersediaan unit pada musim panas untuk memaksimalkan pendapatan, dan jadwalkan pemeliharaan besar (*overhaul*) pada musim dingin.
 * **Strategi Promosi**: Memberikan insentif berupa 'Voucher Khusus Musim Dingin' pada kuartal keempat untuk menjaga stabilitas jumlah penyewaan di luar jam sibuk.
 
+## 🌐 Live Project
+
+Anda dapat mengakses dashboard yang sudah berjalan secara langsung melalui tautan berikut:
+
+* **[Bike Sharing Analysis Dashboard](https://dashboardpy-4c8xrdpnav7jnhd8xjwnpf.streamlit.app/)**
+
 ## 🛠️ Fitur Dashboard
 
 * **Filter Eksplorasi**: Filter rentang waktu dan pemilihan musim secara dinamis di sidebar.
@@ -38,7 +44,7 @@ Berdasarkan visualisasi dan perhitungan pada dashboard, berikut adalah temuan ut
 
 ```
 
-## 🚀 Cara Menjalankan
+## 🚀 Cara Menjalankan secara Lokal
 
 1. **Persiapkan Environment**:
 ```bash
@@ -54,6 +60,8 @@ pip install -r requirements.txt
 streamlit run dashboard/dashboard.py
 
 ```
+
+
 
 ## 📜 Lisensi
 
