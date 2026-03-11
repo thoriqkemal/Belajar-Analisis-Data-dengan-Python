@@ -1,5 +1,5 @@
 # Proyek Analisis Data: Bike Sharing Dashboard
-!**[Bike Sharing Analysis Dashboard]**(demo.gif)
+!**[Bike Sharing Dashboard](./demo.gif)**
 
 Dashboard interaktif ini dibangun menggunakan **Streamlit** untuk menganalisis tren penggunaan sepeda berdasarkan dataset *Bike-sharing*. Proyek ini bertujuan untuk mengidentifikasi pola penyewaan musiman, pengaruh kondisi lingkungan, dan memberikan rekomendasi strategis bagi manajemen operasional.
 
