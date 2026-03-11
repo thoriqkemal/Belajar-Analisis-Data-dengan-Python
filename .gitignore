@@ -23,8 +23,8 @@ build/
 
 # Data and Logs
 *.log
-*.csv
-*.xlsx
+# *.csv
+# *.xlsx
 # (Keep raw data out of Git if it's large)
 data/raw/
 
